@@ -6,7 +6,7 @@ namespace Hardcodet.Wpf.TaskbarNotification.Interop
   /// Win API struct providing coordinates for a single point.
   /// </summary>
   [StructLayout(LayoutKind.Sequential)]
-  public struct Point
+  public struct Win32Point
   {
     public int X;
     public int Y;

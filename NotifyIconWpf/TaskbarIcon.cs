@@ -28,14 +28,14 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using Hardcodet.Wpf.TaskbarNotification.Interop;
-using Point=Hardcodet.Wpf.TaskbarNotification.Interop.Point;
-
-
+using Application = System.Windows.Application;
+using Point = System.Windows.Point;
+using Timer = System.Threading.Timer;
+using ToolTip = System.Windows.Controls.ToolTip;
 
 namespace Hardcodet.Wpf.TaskbarNotification
 {
@@ -206,7 +206,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
       popup.Placement = PlacementMode.AbsolutePoint;
       popup.StaysOpen = true;
 
-      Point position = TrayInfo.GetTrayLocation();
+      Win32Point position = TrayInfo.GetTrayLocation();
       popup.HorizontalOffset = position.X -1;
       popup.VerticalOffset = position.Y -1;
 
@@ -367,8 +367,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
 
 
       //get mouse coordinates
-      Point cursorPosition = new Point();
-      WinApi.GetCursorPos(ref cursorPosition);
+      Point cursorPosition = GetCursorPosition();
 
       bool isLeftClickCommandInvoked = false;
       
@@ -425,6 +424,22 @@ namespace Hardcodet.Wpf.TaskbarNotification
 
     }
 
+    private static Point GetCursorPosition() {
+      Win32Point rawCursorPosition = new Win32Point();
+      WinApi.GetCursorPos(ref rawCursorPosition);
+
+      // FIXME This isn't the best way to get the DPI
+      // (because DPI can be different across different screens)
+      using (var graphics = Graphics.FromImage(new Bitmap(1, 1)))
+      {
+        return new Point
+        (
+          rawCursorPosition.X * 96 / graphics.DpiX,
+          rawCursorPosition.Y * 96 / graphics.DpiY
+        );
+      }
+    }
+
     #endregion
 
     #region ToolTips
@@ -475,13 +490,13 @@ namespace Hardcodet.Wpf.TaskbarNotification
 
 
     /// <summary>
-    /// Creates a <see cref="ToolTip"/> control that either
+    /// Creates a <see cref="System.Windows.Controls.ToolTip"/> control that either
     /// wraps the currently set <see cref="TrayToolTip"/>
     /// control or the <see cref="ToolTipText"/> string.<br/>
     /// If <see cref="TrayToolTip"/> itself is already
-    /// a <see cref="ToolTip"/> instance, it will be used directly.
+    /// a <see cref="System.Windows.Controls.ToolTip"/> instance, it will be used directly.
     /// </summary>
-    /// <remarks>We use a <see cref="ToolTip"/> rather than
+    /// <remarks>We use a <see cref="System.Windows.Controls.ToolTip"/> rather than
     /// <see cref="Popup"/> because there was no way to prevent a
     /// popup from causing cyclic open/close commands if it was
     /// placed under the mouse. ToolTip internally uses a Popup of
@@ -618,7 +633,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
     /// Displays the <see cref="TrayPopup"/> control if
     /// it was set.
     /// </summary>
-    private void ShowTrayPopup(Point cursorPosition)
+    private void ShowTrayPopup(Point position)
     {
       if (IsDisposed) return;
 
@@ -631,8 +646,8 @@ namespace Hardcodet.Wpf.TaskbarNotification
       {
         //use absolute position, but place the popup centered above the icon
         TrayPopupResolved.Placement = PlacementMode.AbsolutePoint;
-        TrayPopupResolved.HorizontalOffset = cursorPosition.X;
-        TrayPopupResolved.VerticalOffset = cursorPosition.Y;
+        TrayPopupResolved.HorizontalOffset = position.X;
+        TrayPopupResolved.VerticalOffset = position.Y;
 
         //open popup
         TrayPopupResolved.IsOpen = true;
@@ -667,10 +682,10 @@ namespace Hardcodet.Wpf.TaskbarNotification
     #region Context Menu
 
     /// <summary>
-    /// Displays the <see cref="ContextMenu"/> if
+    /// Displays the <see cref="System.Windows.Controls.ContextMenu"/> if
     /// it was set.
     /// </summary>
-    private void ShowContextMenu(Point cursorPosition)
+    private void ShowContextMenu(Point position)
     {
       if (IsDisposed) return;
 
@@ -683,8 +698,8 @@ namespace Hardcodet.Wpf.TaskbarNotification
       {
         //use absolute position
         ContextMenu.Placement = PlacementMode.AbsolutePoint;
-        ContextMenu.HorizontalOffset = cursorPosition.X;
-        ContextMenu.VerticalOffset = cursorPosition.Y;
+        ContextMenu.HorizontalOffset = position.X;
+        ContextMenu.VerticalOffset = position.Y;
         ContextMenu.IsOpen = true;
 
         //activate the message window to track deactivation - otherwise, the context menu

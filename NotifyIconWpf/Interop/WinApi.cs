@@ -82,6 +82,6 @@ namespace Hardcodet.Wpf.TaskbarNotification.Interop
     /// <param name="lpPoint"></param>
     /// <returns></returns>
     [DllImport("USER32.DLL", SetLastError = true)]
-    public static extern bool GetCursorPos(ref Point lpPoint);
+    public static extern bool GetCursorPos(ref Win32Point lpPoint);
   }
 }
