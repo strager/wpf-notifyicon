@@ -25,9 +25,7 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -36,7 +34,6 @@ using System.Windows.Resources;
 using System.Windows.Threading;
 using Hardcodet.Wpf.TaskbarNotification.Interop;
 using Microsoft.Win32;
-using PixelFormat = System.Windows.Media.PixelFormat;
 using Point = System.Windows.Point;
 
 namespace Hardcodet.Wpf.TaskbarNotification
@@ -370,14 +367,18 @@ namespace Hardcodet.Wpf.TaskbarNotification
       Win32Point rawCursorPosition = new Win32Point();
       WinApi.GetCursorPos(ref rawCursorPosition);
 
+      return ScreenPositionToDiuPoint(rawCursorPosition);
+    }
+
+    public static Point ScreenPositionToDiuPoint(Win32Point screenPosition) {
       // FIXME This isn't the best way to get the DPI
       // (because DPI can be different across different screens)
       using (var graphics = Graphics.FromImage(new Bitmap(1, 1)))
       {
         return new Point
           (
-          rawCursorPosition.X * 96 / graphics.DpiX,
-          rawCursorPosition.Y * 96 / graphics.DpiY
+          screenPosition.X * 96 / graphics.DpiX,
+          screenPosition.Y * 96 / graphics.DpiY
           );
       }
     }

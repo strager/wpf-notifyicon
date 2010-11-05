@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
 using Hardcodet.Wpf.TaskbarNotification.Interop;
+using Point = System.Windows.Point;
 
 namespace Hardcodet.Wpf.TaskbarNotification {
   public partial class TaskbarIcon {
@@ -158,9 +159,9 @@ namespace Hardcodet.Wpf.TaskbarNotification {
       popup.Placement = PlacementMode.AbsolutePoint;
       popup.StaysOpen = true;
 
-      Win32Point position = TrayInfo.GetTrayLocation();
-      popup.HorizontalOffset = position.X -1;
-      popup.VerticalOffset = position.Y -1;
+      Point position = Util.ScreenPositionToDiuPoint(TrayInfo.GetTrayLocation());
+      popup.HorizontalOffset = position.X - 1;
+      popup.VerticalOffset = position.Y - 1;
 
       //store reference
       lock (this)
