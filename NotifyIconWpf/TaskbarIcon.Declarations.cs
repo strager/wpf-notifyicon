@@ -39,7 +39,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
   /// Contains declarations of WPF dependency properties
   /// and events.
   /// </summary>
-  partial class TaskbarIcon
+  public partial class TaskbarIcon
   {
     /// <summary>
     /// Category name that is set on designer properties.

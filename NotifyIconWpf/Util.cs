@@ -31,6 +31,7 @@ using System.Windows.Media;
 using System.Windows.Resources;
 using System.Windows.Threading;
 using Hardcodet.Wpf.TaskbarNotification.Interop;
+using Point = System.Windows.Point;
 
 namespace Hardcodet.Wpf.TaskbarNotification
 {
@@ -303,6 +304,22 @@ namespace Hardcodet.Wpf.TaskbarNotification
     {
       if (element == null) throw new ArgumentNullException("element");
       return element.GetBindingExpression(FrameworkElement.DataContextProperty) != null;
+    }
+
+    public static Point GetCursorPosition() {
+      Win32Point rawCursorPosition = new Win32Point();
+      WinApi.GetCursorPos(ref rawCursorPosition);
+
+      // FIXME This isn't the best way to get the DPI
+      // (because DPI can be different across different screens)
+      using (var graphics = Graphics.FromImage(new Bitmap(1, 1)))
+      {
+        return new Point
+          (
+          rawCursorPosition.X * 96 / graphics.DpiX,
+          rawCursorPosition.Y * 96 / graphics.DpiY
+          );
+      }
     }
   }
 }

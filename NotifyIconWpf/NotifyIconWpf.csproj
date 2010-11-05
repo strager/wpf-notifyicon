@@ -90,8 +90,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="TaskbarIcon.BalloonTips.cs" />
+    <Compile Include="TaskbarIcon.ContextMenu.cs" />
     <Compile Include="TaskbarIcon.cs" />
     <Compile Include="TaskbarIcon.Declarations.cs" />
+    <Compile Include="TaskbarIcon.Popup.cs" />
+    <Compile Include="TaskbarIcon.ToolTip.cs" />
     <Compile Include="Util.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -99,6 +103,7 @@
     </EmbeddedResource>
     <None Include="Diagrams\TaskbarIcon Overview.cd" />
     <AppDesigner Include="Properties\" />
+    <Compile Include="TaskbarIcon.MouseEvents.cs" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="DefaultTrayIcon.ico" />
