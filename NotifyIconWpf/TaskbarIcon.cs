@@ -82,6 +82,18 @@ namespace Hardcodet.Wpf.TaskbarNotification
       get { return messageSink.Version == NotifyIconVersion.Vista; }
     }
 
+    /// <summary>
+    /// Gets a value indicating whether standard balloons are supported
+    /// using <see cref="ShowBalloonTip"/>.
+    /// </summary>
+    /// <value>
+    /// 	<c>true</c> if standard balloons are supported; otherwise, <c>false</c>.
+    /// </value>
+    public bool SupportsStandardBalloons
+    {
+      get { return Util.CanShowStandardBalloons(); }
+    }
+
 
 
     /// <summary>

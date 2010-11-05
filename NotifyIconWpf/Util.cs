@@ -35,6 +35,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Resources;
 using System.Windows.Threading;
 using Hardcodet.Wpf.TaskbarNotification.Interop;
+using Microsoft.Win32;
 using PixelFormat = System.Windows.Media.PixelFormat;
 using Point = System.Windows.Point;
 
@@ -337,6 +338,18 @@ namespace Hardcodet.Wpf.TaskbarNotification
       return Dispatcher.CurrentDispatcher;
     }
 
+    public static bool CanShowStandardBalloons() {
+      RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced");
+
+      if (key == null)
+      {
+        return true;
+      }
+
+      object value = key.GetValue(@"EnableBalloonTips");
+
+      return value == null || Convert.ToInt32(value) != 0;
+    }
 
     /// <summary>
     /// Checks whether the <see cref="FrameworkElement.DataContextProperty"/>
