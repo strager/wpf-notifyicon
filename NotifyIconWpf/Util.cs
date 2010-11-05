@@ -25,12 +25,17 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Resources;
 using System.Windows.Threading;
 using Hardcodet.Wpf.TaskbarNotification.Interop;
+using PixelFormat = System.Windows.Media.PixelFormat;
 using Point = System.Windows.Point;
 
 namespace Hardcodet.Wpf.TaskbarNotification
@@ -168,15 +173,57 @@ namespace Hardcodet.Wpf.TaskbarNotification
     public static Icon ToIcon(this ImageSource imageSource)
     {
       if (imageSource == null) return null;
+      
+      // If an .ico file was specified, use the .ico directly
+      Icon icon = ConvertImageResourceToIcon(imageSource);
+
+      if (icon != null)
+      {
+        return icon;
+      }
+
+      // Otherwise, chose the fail-safe path of creating a new icon from the image
+      BitmapSource bitmapSource = imageSource as BitmapSource;
+
+      if (bitmapSource == null)
+      {
+        throw new NotSupportedException("Can only convert bitmaps to icons");
+      }
+
+      return ConvertBitmapSourceToIcon(bitmapSource);
+    }
+
+    private static Icon ConvertBitmapSourceToIcon(BitmapSource bitmapSource) {
+      // Copying manually and making sure formats are supported is messy
+      // so we just convert to TIFF then to a GDI+ Bitmap, as that's less
+      // likely to fail miserably
+      using (MemoryStream stream = new MemoryStream())
+      {
+        TiffBitmapEncoder encoder = new TiffBitmapEncoder();
+        encoder.Compression = TiffCompressOption.None; // Compression is a waste of CPU
+        encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
+        encoder.Save(stream);
+
+        stream.Position = 0;
+                
+        IntPtr iconHandle = new Bitmap(stream).GetHicon();
+
+        return Icon.FromHandle(iconHandle);
+      }
+    }
+
+    private static Icon ConvertImageResourceToIcon(ImageSource imageSource) {
+      if (imageSource.GetType().FullName != @"System.Windows.Media.Imaging.BitmapFrameDecode")
+      {
+        return null;
+      }
 
       Uri uri = new Uri(imageSource.ToString());
       StreamResourceInfo streamInfo = Application.GetResourceStream(uri);
 
       if (streamInfo == null)
       {
-        string msg = "The supplied image source '{0}' could not be resolved.";
-        msg = String.Format(msg, imageSource);
-        throw new ArgumentException(msg);
+        return null;
       }
 
       return new Icon(streamInfo.Stream);
