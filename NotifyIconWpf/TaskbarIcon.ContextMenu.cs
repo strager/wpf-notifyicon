@@ -1,5 +1,7 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using Hardcodet.Wpf.TaskbarNotification.Interop;
 
 namespace Hardcodet.Wpf.TaskbarNotification {
@@ -17,13 +19,20 @@ namespace Hardcodet.Wpf.TaskbarNotification {
       var args = RaisePreviewTrayContextMenuOpenEvent();
       if (args.Handled) return;
 
-      if (ContextMenu != null)
+      var contextMenu = ContextMenu;
+
+      if (contextMenu != null)
       {
+        AttachCommandHandlers(contextMenu);
+        CommandManager.InvalidateRequerySuggested();
+
+        AddOneShotHandler(contextMenu, ContextMenu.ClosedEvent, (sender, e) => DetachCommandHandlers(contextMenu));
+
         //use absolute position
-        ContextMenu.Placement = PlacementMode.AbsolutePoint;
-        ContextMenu.HorizontalOffset = screenPosition.X;
-        ContextMenu.VerticalOffset = screenPosition.Y;
-        ContextMenu.IsOpen = true;
+        contextMenu.Placement = PlacementMode.AbsolutePoint;
+        contextMenu.HorizontalOffset = screenPosition.X;
+        contextMenu.VerticalOffset = screenPosition.Y;
+        contextMenu.IsOpen = true;
 
         //activate the message window to track deactivation - otherwise, the context menu
         //does not close if the user clicks somewhere else

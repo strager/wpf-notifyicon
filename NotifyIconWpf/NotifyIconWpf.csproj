@@ -91,6 +91,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="TaskbarIcon.BalloonTips.cs" />
+    <Compile Include="TaskbarIcon.Command.cs" />
     <Compile Include="TaskbarIcon.ContextMenu.cs" />
     <Compile Include="TaskbarIcon.cs" />
     <Compile Include="TaskbarIcon.Declarations.cs" />

@@ -152,7 +152,6 @@ namespace Hardcodet.Wpf.TaskbarNotification
 
     #endregion
 
-
     #region Single Click Timer event
 
     /// <summary>
