@@ -4,8 +4,10 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using Hardcodet.Wpf.TaskbarNotification.Interop;
 
-namespace Hardcodet.Wpf.TaskbarNotification {
-  public partial class TaskbarIcon {
+namespace Hardcodet.Wpf.TaskbarNotification
+{
+  public partial class TaskbarIcon
+  {
     /// <summary>
     /// Displays the <see cref="System.Windows.Controls.ContextMenu"/> if
     /// it was set.
@@ -23,10 +25,17 @@ namespace Hardcodet.Wpf.TaskbarNotification {
 
       if (contextMenu != null)
       {
-        AttachCommandHandlers(contextMenu);
-        CommandManager.InvalidateRequerySuggested();
+        var router = new CommandRerouter(this);
+        router.AttachCommandHandlers(contextMenu);
 
-        AddOneShotHandler(contextMenu, ContextMenu.ClosedEvent, (sender, e) => DetachCommandHandlers(contextMenu));
+        CommandRerouter.AttachOneShotCommandHandler
+        (
+          contextMenu,
+          ContextMenu.ClosedEvent,
+          (sender, e) => router.DetachCommandHandlers(contextMenu)
+        );
+
+        CommandManager.InvalidateRequerySuggested();
 
         //use absolute position
         contextMenu.Placement = PlacementMode.AbsolutePoint;
