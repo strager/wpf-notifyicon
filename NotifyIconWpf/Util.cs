@@ -204,9 +204,24 @@ namespace Hardcodet.Wpf.TaskbarNotification
 
         stream.Position = 0;
                 
-        IntPtr iconHandle = new Bitmap(stream).GetHicon();
+        using (var bitmap = new Bitmap(stream))
+        {
+          IntPtr iconHandle = IntPtr.Zero;
 
-        return Icon.FromHandle(iconHandle);
+          try
+          {
+            iconHandle = bitmap.GetHicon();
+
+            return (Icon) Icon.FromHandle(iconHandle).Clone();
+          }
+          finally
+          {
+            if (iconHandle != IntPtr.Zero)
+            {
+              WinApi.DestroyIcon(iconHandle);
+            }
+          }
+        }
       }
     }
 

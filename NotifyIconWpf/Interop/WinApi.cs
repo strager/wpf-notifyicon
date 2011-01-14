@@ -83,5 +83,8 @@ namespace Hardcodet.Wpf.TaskbarNotification.Interop
     /// <returns></returns>
     [DllImport("USER32.DLL", SetLastError = true)]
     public static extern bool GetCursorPos(ref Win32Point lpPoint);
+
+    [DllImport("user32.dll", EntryPoint = "DestroyIcon")]
+    public static extern bool DestroyIcon(IntPtr hIcon);
   }
 }
